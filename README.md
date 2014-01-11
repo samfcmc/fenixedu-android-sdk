@@ -1,2 +1,0 @@
-fenixedu-android-sdk
-====================
