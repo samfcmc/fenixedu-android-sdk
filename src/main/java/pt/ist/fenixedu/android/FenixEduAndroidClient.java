@@ -3,11 +3,15 @@ package pt.ist.fenixedu.android;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import pt.ist.fenixedu.sdk.FenixEduConfig;
 import pt.ist.fenixedu.sdk.beans.publico.FenixAbout;
 import pt.ist.fenixedu.sdk.beans.publico.FenixSpace;
 
 import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 public class FenixEduAndroidClient {
@@ -99,7 +103,24 @@ public class FenixEduAndroidClient {
 		String token_url = String.format("%s/oauth/access_token",
 				this.config.getBaseUrl());
 
-		client.post(token_url, params, responseHandler);
+		client.post(token_url, params, new JsonHttpResponseHandler() {
+			@Override
+			public void onSuccess(JSONObject json) {
+				String accessToken;
+				String refreshToken;
+				try {
+					accessToken = json.getString("access_token");
+					refreshToken = json.getString("refresh_token");
+					config.setAccessToken(accessToken);
+					config.setRefreshToken(refreshToken);
+					// TODO: Handle refresh
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+		});
 	}
 
 	public void getAbout(FenixEduHttpResponseHandler<FenixAbout> responseHandler) {
